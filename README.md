@@ -1,4 +1,4 @@
-ntunnel
+Ntunnel
 =======
 
 Simple tunnel protocol with RSA keys, signed digests and blowfish cipher using the OpenSSL library and the tuntap device from the Linux kernel and its API.
