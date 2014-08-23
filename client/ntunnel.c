@@ -68,7 +68,8 @@ int main(int argc, char *argv[])
 	if ((usock = CreateMainSocket()) < 0)
 		return 1;
 
-	InitializeClient(tapfd, usock);
+	if (InitializeClient(tapfd, usock) < 0)
+		return 1;
 
 	while (1)
 		DoWorkMultiplexed(tapfd, usock);
