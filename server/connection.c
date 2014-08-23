@@ -264,7 +264,6 @@ int DoWorkMultiplexed(int tapfd, int netfd)
 			}
 
 			/* Get the source client's information */
-			Client = NULL;
 			for (i = 0; i < CurrentClients; i++)
 				if (from.sin_addr.s_addr == Clients[i].ns.data.sin_addr.s_addr) {
 					Client = Clients + i;
