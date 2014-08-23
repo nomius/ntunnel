@@ -54,6 +54,18 @@ const char *randomdev = "/dev/random";
 const char *randomdev = "/dev/urandom";
 #endif
 
+void debug(char *prefix, void *data, size_t data_len)
+{
+#if DEBUG
+	register int i = 0;
+
+	fprintf(stdout, "%s (lenght %.4d): ", prefix, (int)data_len);
+	for (i=0; i < data_len; i++)
+		fprintf(stdout, "0x%2.2X ", ((unsigned char *)data)[i]);
+	printf("\n\n");
+#endif
+}
+
 int ReadN(int fd, struct sockaddr *fromwhere, unsigned char *buf, size_t n)
 {
 	uint32_t plength = 0;
@@ -66,6 +78,7 @@ int ReadN(int fd, struct sockaddr *fromwhere, unsigned char *buf, size_t n)
 	if ((nread = recvfrom(fd, &plength, sizeof(plength), 0, fromwhere, &addrlen)) < sizeof(plength))
 		return (nread == 0 ? 0 : nread);
 
+	debug("Data read [header]", &plength, sizeof(plength));
 	/* Transform the network packet size endianess to host endianess */
 	if ((left = ntohl(plength)) > n) {
 		fprintf(stderr, "JUMBO PACKET NOT SUPPORTED DUE TO ENCRYPTION!!!!!\n");
@@ -101,6 +114,7 @@ int ReadN(int fd, struct sockaddr *fromwhere, unsigned char *buf, size_t n)
 							fprintf(stderr, "ReadN : read : %s\n", strerror(errno));
 							return -1;
 						default:
+							debug("Data read", buf, nread);
 							left -= nread;
 							buf += nread;
 							t += nread;
@@ -126,6 +140,7 @@ int WriteH(int fd, struct sockaddr *towhere, void *buf, size_t len)
 		fprintf(stderr, "WriteH : sendto : %s\n", strerror(errno));
 		return -1;
 	}
+	debug("Data sent [header]", &plength, sizeof(plength));
 
 	/* Send the full chunk */
 	while (left > 0)
@@ -136,6 +151,7 @@ int WriteH(int fd, struct sockaddr *towhere, void *buf, size_t len)
 				fprintf(stderr, "WriteH : sendto : %s\n", strerror(errno));
 				return -1;
 			default:
+				debug("Data sent", buf, nwrite);
 				left -= nwrite;
 				buf = ((char *)buf) + nwrite;
 		}
