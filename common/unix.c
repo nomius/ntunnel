@@ -63,7 +63,7 @@ int ReadN(int fd, struct sockaddr *fromwhere, unsigned char *buf, size_t n)
 	socklen_t addrlen = sizeof(struct sockaddr);
 
 	/* Read the incoming packet size */
-	if ((nread = recvfrom(fd, (unsigned char *)&plength, sizeof(plength), 0, fromwhere, &addrlen)) < sizeof(plength))
+	if ((nread = recvfrom(fd, &plength, sizeof(plength), 0, fromwhere, &addrlen)) < sizeof(plength))
 		return (nread == 0 ? 0 : nread);
 
 	/* Transform the network packet size endianess to host endianess */
@@ -122,7 +122,7 @@ int WriteH(int fd, struct sockaddr *towhere, void *buf, size_t len)
 
 	/* Transform the host endianess to network packet size endianess and send it to the destination */
 	plength = htonl(len);
-	if ((nwrite = sendto(fd, (char *)&plength, sizeof(plength), 0, towhere, addrlen)) < 0) {
+	if ((nwrite = sendto(fd, &plength, sizeof(plength), 0, towhere, addrlen)) < 0) {
 		fprintf(stderr, "WriteH : sendto : %s\n", strerror(errno));
 		return -1;
 	}
